@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="wrapper">
+        <aside class="sidebar">
+            <div class="sidebar__header">
+                <div class="photo">No photo</div>
+                <h2 class="sidebar__title">Добро пожаловать!</h2>
+            </div>
+            <div class="sidebar__users">
+                <h4 class="sidebar__subheader">Участники <span id="count">(2)</span></h4>
+                <ul class="sidebar__list">
+                    <li class="sidebar__item">Михаил Рагулин</li>
+                    <li class="sidebar__item">Иван Иванов</li>
+                </ul>
+            </div>
+        </aside>
+        <div class="chat">
+            <ul class="chat__messages">
+                <li class="chat__message">
+                    <div class="photo">No photo</div>
+                    <div class="chat__message-block">
+                        <div class="chat__message-header">Михаил Рагулин <span>22:17</span></div>
+                        <div class="chat__message-text">Сообщение</div>
+                    </div>
+                </li>
+                <li class="chat__message">
+                    <div class="photo">No photo</div>
+                    <div class="chat__message-block">
+                        <div class="chat__message-header">Иван Иванов <span>22:17</span></div>
+                        <div class="chat__message-text">Сообщение-2</div>
+                    </div>
+                </li>
+            </ul>
+            <div class="chat__footer">
+                <input type="text" class="input" placeholder="Введите сообщение">
+                <button class="button button--send" id="sendMessage">Отправить</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="autorization">
+        <div class="modal__header">Авторизация</div>
+        <div class="modal__wrapper">
+            <input type="text" class="input input--autorize" placeholder="ФИО">
+            <input type="text" class="input input--autorize" placeholder="Ник">
+            <button class="button button--autorize">Войти</button>
+        </div>
+    </div>
+    <div class="modal" id="uploadPhoto">
+        <div class="modal__header">Загрузка фото</div>
+        <div class="modal__wrapper">
+            <div class="upload__photo" id="uploadPhoto">Перетащите фото сюда</div>
+            <div class="buttons-wrapper">
+                <button class="button">Отмена</button>
+                <button class="button">Загрузить</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

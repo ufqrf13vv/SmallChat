@@ -12,7 +12,8 @@
   "license": "MIT",
   "dependencies": {
     "handlebars": "^4.0.11",
-    "handlebars-loader": "^1.6.0"
+    "handlebars-loader": "^1.6.0",
+    "ws": "^4.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
