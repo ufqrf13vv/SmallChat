@@ -17,6 +17,11 @@ body {
     overflow-x: hidden;
 }
 
+input:focus,
+button:focus {
+    outline: none;
+}
+
 @font-face {
     font-family: 'FiraSansMedium';
     src: local('Fira Sans Medium'),
@@ -80,6 +85,10 @@ body {
     margin-right: 10px;
 }
 
+.button[disabled="disabled"] {
+    opacity: .7;
+}
+
 .button--send {
     padding: 0 30px;
     margin-left: 20px;
@@ -111,7 +120,7 @@ body {
 }
 
 .sidebar__list {
-    font-family: 'FiraSansRegular';
+    font-family: 'FiraSansRegular', sans-serif;
     margin: 0;
     padding-left: 15px;
     list-style: none;
@@ -135,18 +144,29 @@ body {
     margin-right: 20px;
 }
 
+.photo--main {
+    cursor: pointer;
+}
+
 .upload__photo {
     display: flex;
     align-items: center;
     align-self: center;
     width: 150px;
     height: 150px;
-    font-family: 'FiraSansLight';
+    font-family: 'FiraSansLight', sans-serif;
     text-align: center;
     color: #c4c4c4;
     border: 1px dashed #c4c4c4;
     border-radius: 10px;
     margin-bottom: 15px;
+    -webkit-background-size: cover;
+    background-size: cover;
+    background-position: 50% 50%;
+}
+
+.upload__photo > img {
+    width: 100%;
 }
 
 .chat {
@@ -177,11 +197,11 @@ body {
 }
 
 .chat__message-header > span {
-    font-family: 'FiraSansLight';
+    font-family: 'FiraSansLight', sans-serif;
 }
 
 .chat__message-text {
-    font-family: 'FiraSansRegular';
+    font-family: 'FiraSansRegular', sans-serif;
 }
 
 .chat__footer {
@@ -190,7 +210,6 @@ body {
 }
 
 .modal {
-    display: none;
     width: 500px;
     position: absolute;
     top: 0;
@@ -199,6 +218,10 @@ body {
     padding: 10px;
     background: #f0f0f0;
     border-radius: 8px;
+}
+
+.modal#uploadPhotoWin {
+    display: none;
 }
 
 .modal__header {

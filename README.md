@@ -1,2 +1,2 @@
-# chat
-Chat on node.js
+# Chat
+Chat on websockets

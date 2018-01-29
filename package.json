@@ -6,8 +6,9 @@
   "author": "mragulin",
   "scripts": {
     "build": "webpack",
-    "watch": "webpack-dev-server --progress --colors",
-    "start": "npm run watch"
+    "server": "webpack-dev-server --progress --colors",
+    "watch": "webpack --watch",
+    "start": "npm run server"
   },
   "license": "MIT",
   "dependencies": {

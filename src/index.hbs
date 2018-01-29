@@ -8,55 +8,37 @@
     <div class="wrapper">
         <aside class="sidebar">
             <div class="sidebar__header">
-                <div class="photo">No photo</div>
-                <h2 class="sidebar__title">Добро пожаловать!</h2>
+                <div class="photo photo--main" id="mainPhoto">No photo</div>
+                <h2 class="sidebar__title" id="title">Добро пожаловать!</h2>
             </div>
             <div class="sidebar__users">
-                <h4 class="sidebar__subheader">Участники <span id="count">(2)</span></h4>
-                <ul class="sidebar__list">
-                    <li class="sidebar__item">Михаил Рагулин</li>
-                    <li class="sidebar__item">Иван Иванов</li>
-                </ul>
+                <h4 class="sidebar__subheader">Участники <span id="count"></span></h4>
+                <ul class="sidebar__list" id="users"></ul>
             </div>
         </aside>
         <div class="chat">
-            <ul class="chat__messages">
-                <li class="chat__message">
-                    <div class="photo">No photo</div>
-                    <div class="chat__message-block">
-                        <div class="chat__message-header">Михаил Рагулин <span>22:17</span></div>
-                        <div class="chat__message-text">Сообщение</div>
-                    </div>
-                </li>
-                <li class="chat__message">
-                    <div class="photo">No photo</div>
-                    <div class="chat__message-block">
-                        <div class="chat__message-header">Иван Иванов <span>22:17</span></div>
-                        <div class="chat__message-text">Сообщение-2</div>
-                    </div>
-                </li>
-            </ul>
+            <ul class="chat__messages" id="chatList"></ul>
             <div class="chat__footer">
-                <input type="text" class="input" placeholder="Введите сообщение">
+                <input type="text" class="input" id="text" placeholder="Введите сообщение">
                 <button class="button button--send" id="sendMessage">Отправить</button>
             </div>
         </div>
     </div>
-    <div class="modal" id="autorization">
+    <div class="modal" id="authorizationWin">
         <div class="modal__header">Авторизация</div>
         <div class="modal__wrapper">
-            <input type="text" class="input input--autorize" placeholder="ФИО">
-            <input type="text" class="input input--autorize" placeholder="Ник">
-            <button class="button button--autorize">Войти</button>
+            <input type="text" class="input input--autorize" id="fio" placeholder="ФИО">
+            <input type="text" class="input input--autorize" id="login" placeholder="Ник">
+            <button class="button button--autorize" id="logIn">Войти</button>
         </div>
     </div>
-    <div class="modal" id="uploadPhoto">
+    <div class="modal" id="uploadPhotoWin">
         <div class="modal__header">Загрузка фото</div>
         <div class="modal__wrapper">
             <div class="upload__photo" id="uploadPhoto">Перетащите фото сюда</div>
             <div class="buttons-wrapper">
-                <button class="button">Отмена</button>
-                <button class="button">Загрузить</button>
+                <button class="button" id="photoCancel">Отмена</button>
+                <button class="button" id="photoLoad" disabled="disabled">Загрузить</button>
             </div>
         </div>
     </div>

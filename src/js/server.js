@@ -1,30 +1,45 @@
-var http = require('http');
-var WebSocketServer = new require('ws');
+const WebSocketServer = require('ws').Server;
+const http = require('http');
+const wss = new WebSocketServer({ port: 8080 });
 
-// подключенные клиенты
-var clients = {};
+var connections = [];
 
-// WebSocket-сервер на порту 8080
-var webSocketServer = new WebSocketServer.Server({port: 8080});
-webSocketServer.on('connection', function(ws) {
+wss.on('connection', function connection(ws) {
+    console.log('new connection');
+    connections.push(ws);
 
-    var id = Math.random();
-    clients[id] = ws;
-    console.log("новое соединение " + id);
+    ws.on('message', function incoming(message) {
+        console.log('==========');
+        console.log('new message "%s"', message);
 
-    ws.on('message', function(message) {
-        console.log('получено сообщение ' + message);
+        connections.forEach(function(connection) {
+            console.log('sending data to client');
+            let data = JSON.parse(message);
+            console.log(data.type);
 
-        for(var key in clients) {
-            clients[key].send(message);
-        }
+            connection.send(message, function(e) {
+                if (e) {
+                    connections = connections.filter(function(current) {
+                        return current !== connection;
+                    });
+
+                    console.log('close connection');
+                }
+            });
+        });
+
+        console.log('==========');
     });
 
     ws.on('close', function() {
-        console.log('соединение закрыто ' + id);
-        delete clients[id];
-    });
+        connections = connections.filter(function(current) {
+            return current !== ws;
+        });
 
+        console.log('close connection');
+    });
 });
 
-console.log("Сервер запущен на портах 8080");
+//http.createServer(function(request, response) {
+//    console.log(request.url);
+//}).listen(8080);
