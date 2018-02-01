@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{{htmlWebpackPlugin.options.title}}</title>
 </head>
 <body>
     <div class="wrapper">
@@ -29,6 +29,7 @@
         <div class="modal__wrapper">
             <input type="text" class="input input--autorize" id="fio" placeholder="ФИО">
             <input type="text" class="input input--autorize" id="login" placeholder="Ник">
+            <button class="button button--autorize" id="all">Все пользователи</button>
             <button class="button button--autorize" id="logIn">Войти</button>
         </div>
     </div>

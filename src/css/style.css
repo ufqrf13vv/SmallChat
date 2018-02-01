@@ -138,6 +138,8 @@ button:focus {
     font-weight: bold;
     text-align: center;
     background: #ffffff;
+    -webkit-background-size: cover;
+    background-size: cover;
     color: #C4C4C4;
     border-radius: 50%;
     padding: 5px;

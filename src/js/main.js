@@ -4,7 +4,10 @@ import '../index.hbs';
 import messageTpl from '../template/message.hbs';
 import userTpl from '../template/user.hbs';
 
-const socket = new WebSocket("ws://localhost:8080");
+import ajax from './modules/ajax';
+import { handleFileSelect, handleDragOver } from './modules/d&d';
+
+const socket = new WebSocket("ws://localhost:8090");
 const sendMessage = document.querySelector('#sendMessage');
 const messageText = document.querySelector('#text');
 const chat = document.querySelector('#chatList');
@@ -14,9 +17,11 @@ const sidebarTitle = document.querySelector('#title');
 const mainPhoto = document.querySelector('#mainPhoto');
 const uploadPhotoWin = document.querySelector('#uploadPhotoWin');
 const photoField = document.querySelector('#uploadPhoto');
+const all = document.querySelector('#all');
 
-let droppedFiles = false;
-let files;
+socket.onopen = () => {
+    console.log('websocket is connected ...');
+};
 
 socket.onmessage = event => {
     let data = JSON.parse(event.data);
@@ -28,6 +33,7 @@ socket.onmessage = event => {
 
         userList.innerHTML += userTpl({name: data.user});
         usersCount.innerHTML = `(${userList.children.length})`;
+        mainPhoto.dataset.login = data.login;
     }
 };
 
@@ -35,28 +41,49 @@ socket.onerror = error => {
     console.log("Ошибка " + error.message);
 };
 
+//  Авторизация пользователя
 logIn.addEventListener('click', () => {
     const fio = document.querySelector('#fio');
     const login = document.querySelector('#login');
     const autorizeWindow = document.querySelector('#authorizationWin');
     let userName = fio.value;
     let userLogin = login.value;
+    let data = JSON.stringify({ login: userLogin, name: userName });
 
-    socket.send(JSON.stringify({
-        user: userName,
-        login: userLogin,
-        type: 'user'
-    }));
+    ajax('/autorize', data)
+    .then(result => {
+        let user = JSON.parse(result);
 
-    sidebarTitle.innerHTML = userName;
-    document.cookie = `user=${userLogin}`;
+        sidebarTitle.innerHTML = user.name;
+
+        if (user.photo) {
+            console.log(user.photo);
+            mainPhoto.innerHTML = '';
+            mainPhoto.style.backgroundImage = `url('${user.photo}')`;
+        }
+
+        socket.send(JSON.stringify({
+            user: user.name,
+            login: user.login,
+            type: 'user'
+        }));
+    });
+
     autorizeWindow.style.display = 'none';
+});
+
+all.addEventListener('click', () => {
+    ajax('/all')
+    .then(result => {
+        console.log(result)
+    })
 });
 
 mainPhoto.addEventListener('click', () => {
     uploadPhotoWin.style.display = 'block';
 });
 
+//  Загрузка фото
 uploadPhotoWin.addEventListener('click', event => {
     let target = event.target;
 
@@ -65,49 +92,29 @@ uploadPhotoWin.addEventListener('click', event => {
         photoField.innerHTML = 'Перетащите фото сюда';
         document.querySelector('#photoLoad').setAttribute('disabled', 'disabled');
     } else if (target.id === 'photoLoad') {
-        console.log(photoField.style.backgroundImage);
+        let login = mainPhoto.dataset.login;
+        let photo = photoField.style.backgroundImage;
+        let data = JSON.stringify({ photo: photo, login: login });
+
+        let formData = new FormData();
+
+        ajax('/photo', data)
+        .then(result => {
+            uploadPhotoWin.style.display = 'none';
+            mainPhoto.innerHTML = '';
+            mainPhoto.style.backgroundImage = `url('${event.target.result}')`;
+            console.log(result)
+        });
     }
 });
 
-uploadPhotoWin.dragenter = event => {
-    event.preventDefault();
-    event.stopPropagation();
-};
+uploadPhotoWin.addEventListener('dragover', () => {
+    handleDragOver(event)
+}, false);
 
-uploadPhotoWin.addEventListener('dragover', handleDragOver, false);
-uploadPhotoWin.addEventListener('drop', handleFileSelect, false);
-
-function handleFileSelect(event) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    let files = event.dataTransfer.files;
-
-    if (files.length > 1) {
-        alert('Выберете только один файл');
-    } else if (files[0].type != 'image/jpeg') {
-        alert('Можно загружать только JPG-файл');
-    } else if (files[0].size > 512000) {
-        alert('Размер файла не должен превышать 512кб');
-    } else {
-        let fileReader = new FileReader();
-
-        fileReader.onload = ( () => {
-            return event => {
-                photoField.innerHTML = '';
-                photoField.style.backgroundImage = `url('${event.target.result}')`;
-            }
-        })(files[0]);
-        fileReader.readAsDataURL(files[0]);
-        document.querySelector('#photoLoad').removeAttribute('disabled');
-    }
-}
-
-function handleDragOver(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'copy';
-}
+uploadPhotoWin.addEventListener('drop', () => {
+    handleFileSelect(event, photoField)
+}, false);
 
 function send() {
     let message = messageText.value;
@@ -119,6 +126,7 @@ function send() {
         time: `${('0' + date.getHours()).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`,
         type: 'message'
     }));
+
     messageText.value = '';
 }
 

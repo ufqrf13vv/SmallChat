@@ -8,12 +8,17 @@
     "build": "webpack",
     "server": "webpack-dev-server --progress --colors",
     "watch": "webpack --watch",
+    "express": "nodemon public/js/server.js",
     "start": "npm run server"
   },
   "license": "MIT",
   "dependencies": {
+    "express": "^4.16.2",
+    "formidable": "^1.1.1",
     "handlebars": "^4.0.11",
     "handlebars-loader": "^1.6.0",
+    "mongodb": "^3.0.2",
+    "mongoose": "^5.0.2",
     "ws": "^4.0.0"
   },
   "devDependencies": {
@@ -21,6 +26,7 @@
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
     "babel-preset-es2015": "^6.24.1",
+    "copy-webpack-plugin": "^4.3.1",
     "css-loader": "^0.28.7",
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.6",

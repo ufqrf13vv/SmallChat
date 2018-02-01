@@ -1,5 +1,6 @@
 const path = require('path');
 const extractTextPlugin = require('extract-text-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
 const PATHS = {
     source: path.join(__dirname, 'src'),
@@ -10,8 +11,8 @@ module.exports = {
     entry: PATHS.source + '/js/main.js',
     output: {
         path: PATHS.build,
-        publicPath: "../",
-        filename: '[name].js'
+        publicPath: '../',
+        filename: 'js/[name].js'
     },
     module: {
         loaders: [{
@@ -42,7 +43,11 @@ module.exports = {
             filename: 'index.html',
             title: 'Чат',
             template: PATHS.source + '/index.hbs'
-        })
+        }),
+        new CopyWebpackPlugin([
+            { from: 'src/js/server/server.js', to: 'js/server.js' },
+            { from: 'src/js/server/ws.js', to: 'js/ws.js' }
+        ])
     ],
     devServer: {
         publicPath: 'http://localhost:8080/',
