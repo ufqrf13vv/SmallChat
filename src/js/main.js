@@ -27,7 +27,11 @@ socket.onmessage = event => {
     let data = JSON.parse(event.data);
 
     if (data.type === 'message') {
-        chat.innerHTML += messageTpl({message: data.message, time: data.time, name: data.name, image: 'image.png'});
+        if (data.photo) {
+            chat.innerHTML += messageTpl({message: data.message, time: data.time, name: data.name, photo: data.photo, photoText: ''});
+        } else {
+            chat.innerHTML += messageTpl({message: data.message, time: data.time, name: data.name, photoText: 'No photo'});
+        }
     } else {
         const usersCount = document.querySelector('#count');
 
@@ -57,7 +61,6 @@ logIn.addEventListener('click', () => {
         sidebarTitle.innerHTML = user.name;
 
         if (user.photo) {
-            console.log(user.photo);
             mainPhoto.innerHTML = '';
             mainPhoto.style.backgroundImage = `url('${user.photo}')`;
         }
@@ -96,34 +99,34 @@ uploadPhotoWin.addEventListener('click', event => {
         let photo = photoField.style.backgroundImage;
         let data = JSON.stringify({ photo: photo, login: login });
 
-        let formData = new FormData();
-
         ajax('/photo', data)
         .then(result => {
+            console.log(result);
             uploadPhotoWin.style.display = 'none';
             mainPhoto.innerHTML = '';
-            mainPhoto.style.backgroundImage = `url('${event.target.result}')`;
-            console.log(result)
+            mainPhoto.style.backgroundImage = `url('${result}')`;
         });
     }
 });
 
-uploadPhotoWin.addEventListener('dragover', () => {
+uploadPhotoWin.addEventListener('dragover', event => {
     handleDragOver(event)
 }, false);
 
-uploadPhotoWin.addEventListener('drop', () => {
+uploadPhotoWin.addEventListener('drop', event => {
     handleFileSelect(event, photoField)
 }, false);
 
 function send() {
     let message = messageText.value;
     let date = new Date();
+    let avatar = mainPhoto.style.backgroundImage;
 
     socket.send(JSON.stringify({
         message: message,
         name: sidebarTitle.innerHTML,
         time: `${('0' + date.getHours()).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}`,
+        photo: avatar,
         type: 'message'
     }));
 

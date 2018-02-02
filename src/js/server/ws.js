@@ -3,7 +3,7 @@ const wss = new WebSocketServer({port: 8090});
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-let connections = [];
+let connections = {};
 
 mongoose.Promise = global.Promise;
 
@@ -17,6 +17,7 @@ let userSchema = new Schema({
 });
 
 let messageSchema = new Schema({
+    login: String,
     name: String,
     message: String,
     time: String
@@ -30,56 +31,47 @@ mongoose.connect('mongodb://localhost:27017/chatdb');
 const User = mongoose.model('User', userSchema);
 const Message = mongoose.model('Message', messageSchema);
 
-wss.on('connection', function connection(ws) {
-    console.log('new connection');
-    connections.push(ws);
+wss.on('connection', function (ws) {
+    let id = getRandomArbitrary(1, 50);
 
-    ws.on('message', function incoming(message) {
-        console.log('==========');
-        console.log('new message "%s"', message);
+    connections[id] = ws;
+    console.log("новое соединение " + id);
 
-        connections.forEach(function (connection) {
+    ws.on('message', function (message) {
+        console.log('получено сообщение ' + message);
+
+        for (let key in connections) {
             let data = JSON.parse(message);
 
-            //switch (data.type) {
-            //    case 'user':
-            //        User.create({name: data.user, login: data.login}, (err, doc) => {
-            //            createCallBack(err, doc, 'user');
-            //        });
-            //        break;
-            //    case 'message':
-            //        Message.create({name: data.name, message: data.message, time: data.time}, (err, doc) => {
-            //            createCallBack(err, doc, 'message');
-            //        });
-            //        break;
-            //}
+            if (data.type === 'message') {
+                Message.create({ name: data.name,
+                                 message: data.message,
+                                 time: data.time,
+                                 login: data.login
+                },
+                    (err, doc) => {
+                        createCallBack(err, doc, 'message');
+                });
+            }
 
-            connection.send(message, function (e) {
-                if (e) {
-                    connections = connections.filter(function (current) {
-                        return current !== connection;
-                    });
-
-                    console.log('close connection');
-                }
-            });
-        });
-        console.log('==========');
+            connections[key].send(message);
+        }
     });
 
     ws.on('close', function () {
-        connections = connections.filter(function (current) {
-            return current !== ws;
-        });
-
-        mongoose.disconnect();
-        console.log('close connection');
+        console.log('соединение закрыто ' + id);
+        delete connections[id];
     });
+
 });
 
 function createCallBack(error, document, object) {
     if (error) return console.log(error);
     console.log(`Сохранен объект ${object}`, document);
+}
+
+function getRandomArbitrary(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
 }
 
 module.exports = {

@@ -21,31 +21,29 @@ app.get('/', function (req, res) {
 
 //  Фото пользователя
 app.post('/photo', function (req, res) {
-    let id = '';
     let img = req.body.photo;
     let base64Data = '';
     let binaryData = '';
     let path = `../images/${req.body.login}.jpeg`;
 
-    base64Data = img.replace('url("data:image/jpeg;base64,', ''); //url("data:image/jpeg;base64,
+    base64Data = img.replace('url("data:image/jpeg;base64,', '');
     base64Data += base64Data.replace('+', ' ');
     base64Data += base64Data.replace('")', ' ');
     binaryData = new Buffer(base64Data, 'base64').toString('binary');
 
     fs.writeFile(path, binaryData, 'binary', function (err) {
-        res.send('Photo upload');
-        console.log(err);
+        if(err) return console.log(err);
     });
 
     ws.User.findOne({login: req.body.login}, function (err, user) {
         if (err) return console.log(err);
 
-        id = user._id;
+        let id = user._id;
 
         ws.User.findByIdAndUpdate(id, {photo: path}, function(err, user){
             if(err) return console.log(err);
 
-            res.send('update');
+            res.send(path);
         });
     });
 });
@@ -76,7 +74,6 @@ app.post('/all', function (req, res) {
 
         res.send(users);
     });
-    //res.send(req.body.photo);
 });
 
 app.listen(8080, function () {
