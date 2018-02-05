@@ -68,14 +68,6 @@ app.post('/autorize', function (req, res) {
     });
 });
 
-app.post('/all', function (req, res) {
-    ws.User.find({}, function(err, users){
-        if(err) return console.log(err);
-
-        res.send(users);
-    });
-});
-
 app.listen(8080, function () {
     console.log('Listen port 8080!')
 });

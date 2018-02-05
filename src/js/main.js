@@ -18,6 +18,7 @@ const mainPhoto = document.querySelector('#mainPhoto');
 const uploadPhotoWin = document.querySelector('#uploadPhotoWin');
 const photoField = document.querySelector('#uploadPhoto');
 const all = document.querySelector('#all');
+const usersCount = document.querySelector('#count');
 
 socket.onopen = () => {
     console.log('websocket is connected ...');
@@ -26,19 +27,54 @@ socket.onopen = () => {
 socket.onmessage = event => {
     let data = JSON.parse(event.data);
 
-    if (data.type === 'message') {
-        if (data.photo) {
-            chat.innerHTML += messageTpl({message: data.message, time: data.time, name: data.name, photo: data.photo, photoText: ''});
-        } else {
-            chat.innerHTML += messageTpl({message: data.message, time: data.time, name: data.name, photoText: 'No photo'});
-        }
-    } else {
-        const usersCount = document.querySelector('#count');
+    switch (data.type) {
+        case 'message':
+            if (data.photo) {
+                chat.innerHTML += messageTpl({
+                    message: data.message,
+                    time: data.time,
+                    name: data.name,
+                    photo: data.photo,
+                    photoText: ''
+                });
+            } else {
+                chat.innerHTML += messageTpl({
+                    message: data.message,
+                    time: data.time,
+                    name: data.name,
+                    photoText: 'No photo'
+                });
+            }
 
-        userList.innerHTML += userTpl({name: data.user});
-        usersCount.innerHTML = `(${userList.children.length})`;
-        mainPhoto.dataset.login = data.login;
+            break;
+        case 'user':
+            userList.innerHTML += userTpl({name: data.user, login: data.login});
+            usersCount.innerHTML = `(${ userList.children.length })`;
+            mainPhoto.dataset.login = data.login;
+
+            break;
+        case 'disconnect':
+            let users = userList.querySelectorAll('.sidebar__item');
+
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].dataset.login === data.login) {
+                    users[i].remove();
+                }
+            }
+
+            if (userList.children.length) {
+                usersCount.innerHTML = `(${ userList.children.length })`;
+            }
     }
+};
+
+window.onbeforeunload = () => {
+    let login = mainPhoto.dataset.login;
+
+    socket.send(JSON.stringify({
+        login: login,
+        type: 'disconnect'
+    }));
 };
 
 socket.onerror = error => {
@@ -52,34 +88,27 @@ logIn.addEventListener('click', () => {
     const autorizeWindow = document.querySelector('#authorizationWin');
     let userName = fio.value;
     let userLogin = login.value;
-    let data = JSON.stringify({ login: userLogin, name: userName });
+    let data = JSON.stringify({login: userLogin, name: userName});
 
     ajax('/autorize', data)
-    .then(result => {
-        let user = JSON.parse(result);
+        .then(result => {
+            let user = JSON.parse(result);
 
-        sidebarTitle.innerHTML = user.name;
+            sidebarTitle.innerHTML = user.name;
 
-        if (user.photo) {
-            mainPhoto.innerHTML = '';
-            mainPhoto.style.backgroundImage = `url('${user.photo}')`;
-        }
+            if (user.photo) {
+                mainPhoto.innerHTML = '';
+                mainPhoto.style.backgroundImage = `url('${user.photo}')`;
+            }
 
-        socket.send(JSON.stringify({
-            user: user.name,
-            login: user.login,
-            type: 'user'
-        }));
-    });
+            socket.send(JSON.stringify({
+                user: user.name,
+                login: user.login,
+                type: 'user'
+            }));
+        });
 
     autorizeWindow.style.display = 'none';
-});
-
-all.addEventListener('click', () => {
-    ajax('/all')
-    .then(result => {
-        console.log(result)
-    })
 });
 
 mainPhoto.addEventListener('click', () => {
@@ -97,15 +126,14 @@ uploadPhotoWin.addEventListener('click', event => {
     } else if (target.id === 'photoLoad') {
         let login = mainPhoto.dataset.login;
         let photo = photoField.style.backgroundImage;
-        let data = JSON.stringify({ photo: photo, login: login });
+        let data = JSON.stringify({photo: photo, login: login});
 
         ajax('/photo', data)
-        .then(result => {
-            console.log(result);
-            uploadPhotoWin.style.display = 'none';
-            mainPhoto.innerHTML = '';
-            mainPhoto.style.backgroundImage = `url('${result}')`;
-        });
+            .then(result => {
+                uploadPhotoWin.style.display = 'none';
+                mainPhoto.innerHTML = '';
+                mainPhoto.style.backgroundImage = `url('${result}')`;
+            });
     }
 });
 

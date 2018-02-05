@@ -32,13 +32,13 @@ const User = mongoose.model('User', userSchema);
 const Message = mongoose.model('Message', messageSchema);
 
 wss.on('connection', function (ws) {
-    let id = getRandomArbitrary(1, 50);
+    let id = Math.floor(Math.random() * (100 - 10)) + 10;
 
     connections[id] = ws;
-    console.log("новое соединение " + id);
+    console.log("Новое соединение " + id);
 
     ws.on('message', function (message) {
-        console.log('получено сообщение ' + message);
+        console.log('Получено сообщение ' + message);
 
         for (let key in connections) {
             let data = JSON.parse(message);
@@ -50,7 +50,7 @@ wss.on('connection', function (ws) {
                                  login: data.login
                 },
                     (err, doc) => {
-                        createCallBack(err, doc, 'message');
+                        if (err) return console.log(err);
                 });
             }
 
@@ -59,20 +59,10 @@ wss.on('connection', function (ws) {
     });
 
     ws.on('close', function () {
-        console.log('соединение закрыто ' + id);
+        console.log(`Соединение №${id} закрыто.`);
         delete connections[id];
     });
-
 });
-
-function createCallBack(error, document, object) {
-    if (error) return console.log(error);
-    console.log(`Сохранен объект ${object}`, document);
-}
-
-function getRandomArbitrary(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-}
 
 module.exports = {
     User: User,
